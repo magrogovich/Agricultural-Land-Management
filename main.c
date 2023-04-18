@@ -12,6 +12,55 @@ struct agri_data {
     double humidity;
 };
 
+// struct potato {
+//   int water_needs = 20; // in millimeters per day
+//   int ideal_temperature = 60; // in degrees Fahrenheit
+//   int ideal_humidity = 70; // in percentage
+//   int days_to_grow = 130; // using days
+// };
+
+// struct Watermelon {
+//   int water_needs = 30; // in millimeters per day
+//   int ideal_temperature = 80; // in degrees Fahrenheit
+//   int ideal_humidity = 80; // in percentage
+//   int days_to_grow = 90; // using days
+// };
+
+// struct Tomato {
+//   int water_needs = 25; // in millimeters per day
+//   int ideal_temperature = 75; // in degrees Fahrenheit
+//   int ideal_humidity = 60; // in percentage
+//   int days_to_grow = 100; // using days
+// };
+
+
+
+
+
+void logo();
+void get_json(struct agri_data *ad); 
+void get_data(struct agri_data *ad); 
+
+
+
+
+
+
+
+int main() {
+    struct agri_data ad;
+
+    logo();
+    get_data(&ad); 
+    printf("Plant type: %s\n", ad.plant_type);
+    printf("Location: %s\n", ad.location);
+    printf("Planting date: %s\n", ad.planting_date);
+    printf("Temperature: %.2f\n", ad.temp);
+    printf("Humidity: %.2f\n", ad.humidity);
+    // waterneed()
+}
+
+
 
 void logo(){
     printf(" ________  ________  ________  ___                 ________  ________  ________     \n");
@@ -28,13 +77,15 @@ void logo(){
     printf("collecting data...\n");
 }
 
-void get_json(struct agri_data ad){
+
+
+void get_json(struct agri_data *ad) { 
     CURL *curl;
     CURLcode res;
 
     char url[256];
     char secKEY[] = "f25b506ac957b7f573f28dcfa939679a";
-    sprintf(url, "https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s", ad.location , secKEY);
+    sprintf(url, "https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s", ad->location , secKEY); // Changed ad.location to ad->location to access the member variable through the pointer
     curl = curl_easy_init();
 
     if (curl) {
@@ -71,9 +122,6 @@ void get_json(struct agri_data ad){
 
     sprintf(data, "%s%s", data, "}");
 
-
-
-
     cJSON *root = cJSON_Parse(data);
     if (root == NULL) {
         printf("Error parsing JSON: %s\n", cJSON_GetErrorPtr());
@@ -97,8 +145,9 @@ void get_json(struct agri_data ad){
         cJSON_Delete(root);
     }
 
-    ad.temp = temp->valuedouble;
-    ad.humidity = humidity->valuedouble;
+    ad->temp = temp->valuedouble; // Changed ad.temp to ad->temp to access the member variable through the pointer
+    ad->humidity = humidity->valuedouble;
+
     cJSON_Delete(root);
     fclose(file);
 
@@ -106,38 +155,14 @@ void get_json(struct agri_data ad){
 }
 
 
-void get_data(){
+void get_data(struct agri_data *ad) {
+    printf("Enter plant type (potato, tomato, watermelon): ");
+    scanf("%s", ad->plant_type);
+    printf("Enter location: ");
+    scanf("%s", ad->location);
+    printf("Enter planting date: ");
+    scanf("%s", ad->planting_date);
 
-    struct agri_data ad;
-
-    printf("enter plant type: potato, tomato, watermelon:\n");
-    scanf("%s",ad.plant_type);
-    printf("enter land location:\n");
-    scanf("%s",ad.location);
-    printf("enter planting date:\n");
-    scanf("%s",ad.planting_date);
     get_json(ad);
-
-
-
 }
 
-
-
-
-int main() {
-    struct agri_data ad;
-
-    logo();
-    get_data();
-
-    printf("Plant type: %s\n", ad.plant_type);
-    printf("Location: %s\n", ad.location);
-    printf("Planting date: %s\n", ad.planting_date);
-    printf("Temperature: %.2f\n", ad.temp);
-    printf("Humidity: %.2f\n", ad.humidity);
-
-
-    return 0;
-
-}
