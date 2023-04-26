@@ -206,4 +206,31 @@ void waterneed(struct agri_data *ad){
 
     float water_needed = ((float)final_water * (float)ad->humidity / (float)final_humidity) * ((float)final_temp - ((float)ad->temp - 273.15)) / 10;
     printf("Water needed: %.2f millimeters for this day\n", water_needed);
+
+
+    // ------------------------FINAL------------------------
+
+
+    cJSON *out = cJSON_CreateObject();
+    
+    // add some data to the object
+    cJSON_AddStringToObject(out, "Date", ad->planting_date);
+    cJSON_AddStringToObject(out, "PlantType", ad->plant_type);
+    cJSON_AddStringToObject(out, "Location", ad->location);
+    cJSON_AddNumberToObject(out, "Temperature", ad->temp);
+    cJSON_AddNumberToObject(out, "Humidity", ad->humidity);
+    cJSON_AddNumberToObject(out, "WaterNeed", water_needed);
+    
+    // convert the object to a string
+    char *json_string = cJSON_Print(out);
+    
+    // create a file and write the JSON string to it
+    FILE *fp;
+    fp = fopen("output.json", "a");
+    fprintf(fp, "%s,\n", json_string);
+    fclose(fp);
+    
+    // free the memory used by the JSON object and string
+    cJSON_Delete(out);
+    free(json_string);
 }
