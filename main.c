@@ -12,36 +12,12 @@ struct agri_data {
     double humidity;
 };
 
-// struct potato {
-//   int water_needs = 20; // in millimeters per day
-//   int ideal_temperature = 60; // in degrees Fahrenheit
-//   int ideal_humidity = 70; // in percentage
-//   int days_to_grow = 130; // using days
-// };
-
-// struct Watermelon {
-//   int water_needs = 30; // in millimeters per day
-//   int ideal_temperature = 80; // in degrees Fahrenheit
-//   int ideal_humidity = 80; // in percentage
-//   int days_to_grow = 90; // using days
-// };
-
-// struct Tomato {
-//   int water_needs = 25; // in millimeters per day
-//   int ideal_temperature = 75; // in degrees Fahrenheit
-//   int ideal_humidity = 60; // in percentage
-//   int days_to_grow = 100; // using days
-// };
-
-
-
-
 
 void logo();
 void get_json(struct agri_data *ad); 
 void get_data(struct agri_data *ad); 
 
-
+void waterneed(struct agri_data *ad);
 
 
 
@@ -57,7 +33,7 @@ int main() {
     printf("Planting date: %s\n", ad.planting_date);
     printf("Temperature: %.2f\n", ad.temp);
     printf("Humidity: %.2f\n", ad.humidity);
-    // waterneed()
+    waterneed(&ad);
 }
 
 
@@ -166,3 +142,68 @@ void get_data(struct agri_data *ad) {
     get_json(ad);
 }
 
+
+void waterneed(struct agri_data *ad){
+
+
+    FILE* file = fopen("profiles.json","rb");
+    if (file == NULL){
+        printf("error");
+        exit(1);
+    }
+
+    fseek(file,0L, SEEK_END);
+    int size = ftell(file);
+    rewind(file);
+
+
+    char data[size+1];
+
+    fgets(data,size,file);
+
+    sprintf(data, "%s%s", data, "}");
+
+    // printf("%s",data);
+
+    cJSON *root = cJSON_Parse(data);
+    if (root == NULL){
+        printf("Error parsing JSON: %s\n", cJSON_GetErrorPtr());
+    }
+
+    cJSON *plant = cJSON_GetObjectItemCaseSensitive(root,ad->plant_type);
+
+    if (plant == NULL) {
+        printf("Error getting 'plant' object\n");
+        cJSON_Delete(root);
+    }
+
+    cJSON *tempr = cJSON_GetObjectItemCaseSensitive(plant,"ideal_temperature");
+
+    if (tempr == NULL) {
+        printf("Error getting 'plant' object\n");
+        cJSON_Delete(root);
+    }
+
+    cJSON *humid = cJSON_GetObjectItemCaseSensitive(plant,"ideal_humidity");
+
+    if (humid == NULL) {
+        printf("Error getting 'plant' object\n");
+        cJSON_Delete(root);
+    }    
+    
+    cJSON *watr = cJSON_GetObjectItemCaseSensitive(plant,"water_needs");
+
+    if (watr == NULL) {
+        printf("Error getting 'plant' object\n");
+        cJSON_Delete(root);
+    }
+
+
+    int final_temp = tempr->valueint;
+    int final_humidity = humid->valueint;
+    int final_water = watr->valueint;
+
+
+    float water_needed = ((float)final_water * (float)ad->humidity / (float)final_humidity) * ((float)final_temp - ((float)ad->temp - 273.15)) / 10;
+    printf("Water needed: %.2f millimeters for this day\n", water_needed);
+}
