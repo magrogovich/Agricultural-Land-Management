@@ -29,5 +29,4 @@ gcc -o agri agri.c -lcurl -lcjson
 
 ## Contributing
 Contributions to this project are welcome. If you find any bugs or want to suggest improvements, please open an issue or a pull request.
-![alt text](http://url/to/img.png)
 
