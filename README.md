@@ -9,8 +9,7 @@ git clone https://github.com/example-user/agricultural-land-management.git
 
 2. Install dependencies:
 
-sudo apt-get install libcurl4-openssl-dev
-sudo apt-get install libcjson-dev
+![alt text](https://raw.githubusercontent.com/magrogovich/c-project/main/ray-so-export%20(5).png)
 
 3. Compile the program:
 
