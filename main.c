@@ -61,7 +61,7 @@ void get_json(struct agri_data *ad) {
 
     char url[256];
     char secKEY[] = "f25b506ac957b7f573f28dcfa939679a";
-    sprintf(url, "https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s", ad->location , secKEY); // Changed ad.location to ad->location to access the member variable through the pointer
+    sprintf(url, "https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s", ad->location , secKEY); 
     curl = curl_easy_init();
 
     if (curl) {
@@ -121,7 +121,7 @@ void get_json(struct agri_data *ad) {
         cJSON_Delete(root);
     }
 
-    ad->temp = temp->valuedouble; // Changed ad.temp to ad->temp to access the member variable through the pointer
+    ad->temp = temp->valuedouble; 
     ad->humidity = humidity->valuedouble;
 
     cJSON_Delete(root);
@@ -213,7 +213,6 @@ void waterneed(struct agri_data *ad){
 
     cJSON *out = cJSON_CreateObject();
     
-    // add some data to the object
     cJSON_AddStringToObject(out, "Date", ad->planting_date);
     cJSON_AddStringToObject(out, "PlantType", ad->plant_type);
     cJSON_AddStringToObject(out, "Location", ad->location);
@@ -221,16 +220,13 @@ void waterneed(struct agri_data *ad){
     cJSON_AddNumberToObject(out, "Humidity", ad->humidity);
     cJSON_AddNumberToObject(out, "WaterNeed", water_needed);
     
-    // convert the object to a string
     char *json_string = cJSON_Print(out);
     
-    // create a file and write the JSON string to it
     FILE *fp;
     fp = fopen("output.json", "a");
     fprintf(fp, "%s,\n", json_string);
     fclose(fp);
     
-    // free the memory used by the JSON object and string
     cJSON_Delete(out);
     free(json_string);
 }
